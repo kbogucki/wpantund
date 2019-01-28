@@ -4908,14 +4908,18 @@ SpinelNCPInstance::should_filter_address(const struct in6_addr &addr, uint8_t pr
 		// Filter RLOC link-local or mesh-local addresses
 
 		if (0 == memcmp(rloc_bytes, addr.s6_addr + 8, sizeof(rloc_bytes))) {
-			if (IN6_IS_ADDR_LINKLOCAL(&addr)) {
-				should_filter = true;
-			}
 
-			if (buffer_is_nonzero(mNCPV6Prefix, sizeof(mNCPV6Prefix))
-				&& (0 == memcmp(mNCPV6Prefix, &addr, sizeof(mNCPV6Prefix)))
-			) {
-				should_filter = true;
+			// Do not filter ALOC addresses
+			if (addr.s6_addr[14] != 0xFC) {
+				if (IN6_IS_ADDR_LINKLOCAL(&addr)) {
+					should_filter = true;
+				}
+
+				if (buffer_is_nonzero(mNCPV6Prefix, sizeof(mNCPV6Prefix))
+					&& (0 == memcmp(mNCPV6Prefix, &addr, sizeof(mNCPV6Prefix)))
+				) {
+					should_filter = true;
+				}
 			}
 		}
 	}
